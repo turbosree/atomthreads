@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+Library:      Atomthreads
+Author:       Kelvin Lawson <info@atomthreads.com>
+Website:      http://atomthreads.com
+License:      BSD Revised
+
+---------------------------------------------------------------------------
+
+AVR32B PORT
+
+This work is in progress. Basic implementation is complete.
+
+TBD:
+- All 'SN:' TBDs
+- Testing on ATngw100/STK1000
+- UART Driver 
+- Automated tests implementation
+
+
