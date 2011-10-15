@@ -68,7 +68,7 @@ vpath %.elf ./$(BUILD_DIR)
 vpath %.hex ./$(BUILD_DIR)
 
 # GCC flags
-CFLAGS=-DBOARD=STK1000 -O0 -g3 -Wall -fmessage-length=0 -mpart=$(PART) -ffunction-sections -masm-addr-pseudos
+CFLAGS=-DBOARD=NGW100 -O0 -g3 -Wall -fmessage-length=0 -mpart=$(PART) -ffunction-sections -masm-addr-pseudos
 
 # Enable stack-checking (disable if not required)
 ifeq ($(STACK_CHECK),true)
@@ -110,7 +110,9 @@ $(APP_OBJECTS): %.o: ./%.c
 
 # Application asm objects builder
 $(APP_ASM_OBJECTS): %.o: ./%.s
-	$(CC) -c $(CFLAGS) -x assembler-with-cpp -I. -I$(KERNEL_DIR) -I$(AVR32_INC_DIR) $< -o $(BUILD_DIR)/$(notdir $@)
+	$(CC) -c -x assembler-with-cpp -mpart=$(PART) -Wa,-g3 \
+	-I. -I$(KERNEL_DIR) -I$(AVR32_INC_DIR) \
+	$< -o $(BUILD_DIR)/$(notdir $@)
 
 # INTC_DRIVER asm objects builder
 $(INTC_DRIVER_OBJECTS): %.o: $(INTC_DRIVER_DIR)/%.c 
@@ -118,7 +120,9 @@ $(INTC_DRIVER_OBJECTS): %.o: $(INTC_DRIVER_DIR)/%.c
 
 # INTC_DRIVER_ASM objects builder
 $(INTC_DRIVER_ASM_OBJECTS): %.o: $(INTC_DRIVER_DIR)/%.s
-	$(CC) -c $(CFLAGS) -x assembler-with-cpp -I. -I$(INTC_DRIVER_DIR) -I$(AVR32_INC_DIR) $< -o $(BUILD_DIR)/$(notdir $@)
+	$(CC) -c -x assembler-with-cpp -mpart=$(PART) -Wa,-g3 \
+	-I. -I$(INTC_DRIVER_DIR) -I$(AVR32_INC_DIR) \
+	$< -o $(BUILD_DIR)/$(notdir $@)
 
 # PM_DRIVER asm objects builder
 $(PM_DRIVER_OBJECTS): %.o: $(PM_DRIVER_DIR)/%.c 

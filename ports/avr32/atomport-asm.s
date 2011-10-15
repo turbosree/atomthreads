@@ -63,9 +63,8 @@ archContextSwitch:
 
     /**
      * Parameter locations:
-	  * SN: TBD - Not sure! Asked in Atmel AVR32 tools list
-     *  old_tcb_ptr = R0
-     *  new_tcb_ptr = R1
+	  *  old_tcb_ptr = R12
+     *  new_tcb_ptr = R11
      */
 
     /**
@@ -98,7 +97,7 @@ archContextSwitch:
 		 Store SP to old_tcb_ptr->sp_save_ptr which is conveniently the
 		 first member of the TCB.
 	  */
-	 st.w r0[0],sp 
+	 st.w r12[0],sp 
 
     /**
      * At this point, all of the current thread's context has been saved
@@ -147,7 +146,7 @@ archContextSwitch:
 		 Load new_tcb_ptr->sp_save_ptr into SP. It is conveniently the
 		 first member of the TCB.
 	   */
-	 ld.w sp,r1
+	 ld.w sp,r11
 		  
     /**
      * Restore registers
@@ -243,8 +242,7 @@ archFirstThreadRestore:
 
     /**
      * Parameter locations:
-	  * SN: TBD - Not sure! Asked in Atmel AVR32 tools list		  
-     *  new_tcb_ptr = R0
+	  * new_tcb_ptr = R12
      */
 
     /**
@@ -263,7 +261,7 @@ archFirstThreadRestore:
 		 of the TCB. Set our stack pointer to the new thread's stack pointer,
 		 from its TCB.
      */
-	 ld.w sp,r0
+	 ld.w sp,r12
 	 	  
     /**
      * Restore registers
