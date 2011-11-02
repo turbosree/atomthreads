@@ -412,7 +412,7 @@ void avrInitSystemTickTimer ( void )
    /**
       Register the TC0 interrupt handler to the interrupt controller.
    */
-   INTC_register_interrupt(&tc_irq, AVR32_TC0_IRQ0, AVR32_INTC_NUM_IRQS_PER_GRP0);
+   INTC_register_interrupt(&tc_irq, AVR32_TC0_IRQ0, AVR32_INTC_INT0);
 
    Enable_global_interrupt();
 
