@@ -36,8 +36,10 @@
 /* Prerequisite include for ATOMLOG() macro (via printf) */
 #include <stdio.h>
 
+extern void uprint(const char* str, ...);
+
 /* Logger macro for viewing test results */
-#define ATOMLOG     printf_P
+#define ATOMLOG(str, ...) uprint (str, ## __VA_ARGS__)
 
 /*
  * String location macro: for platforms which need to place strings in
@@ -54,6 +56,11 @@
 /* Uncomment to enable logging of stack usage to UART */
 /* #define TESTS_LOG_STACK_USAGE */
 
+#  define ONBOARD_USART               (&AVR32_USART1)
+#  define ONBOARD_USART_RX_PIN        AVR32_USART1_RXD_0_PIN
+#  define ONBOARD_USART_RX_FUNCTION   AVR32_USART1_RXD_0_FUNCTION
+#  define ONBOARD_USART_TX_PIN        AVR32_USART1_TXD_0_PIN
+#  define ONBOARD_USART_TX_FUNCTION   AVR32_USART1_TXD_0_FUNCTION
 
 #endif /* __ATOM_PORT_TESTS_H */
 

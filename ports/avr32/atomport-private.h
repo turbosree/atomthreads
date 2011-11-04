@@ -32,6 +32,7 @@
 
 /* CPU Frequency */
 #define AVR32_CPU_HZ          96000000 // 96MHz
+#define PBA_HZ AVR32_CPU_HZ/4
 
 /* Function prototypes */
 void avrInitSystemTickTimer ( void );

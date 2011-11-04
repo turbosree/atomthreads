@@ -33,7 +33,8 @@
 #include "atomport-private.h"
 #include "atomtests.h"
 #include "atomtimer.h"
-/* #include "uart.h" */ //SN: TBD - Implement UART driver for AP7000
+#include "driver/PIO/pio.h"
+#include "driver/USART/usart.h"
 
 
 /* Constants */
@@ -142,7 +143,11 @@ static void main_thread_func (uint32_t data);
  */
 
 //SN: TBD - This file is TBD! 
-void printf_P(const char* str) {}
+void uprint(const char* str, ...) 
+{
+   //SN: TBD - va_arg not used! */
+   usart_write_line(ONBOARD_USART, str);
+}
 
 int main ( void )
 {
@@ -208,6 +213,42 @@ int main ( void )
    return (0);
 }
 
+/**
+ * \b usart_app_init
+ *
+ * Initialize USART device.
+ *
+ * @param[in] None
+ *
+ * @return None
+ */
+void usart_app_init(void)
+{
+   static const gpio_map_t USART_GPIO_MAP =
+      {
+         {ONBOARD_USART_RX_PIN, ONBOARD_USART_RX_FUNCTION},
+         {ONBOARD_USART_TX_PIN, ONBOARD_USART_TX_FUNCTION}
+      };
+
+   // USART options.
+   static const usart_options_t USART_OPTIONS =
+      {
+         .baudrate     = 115200,
+         .charlength   = 8,
+         .paritytype   = USART_NO_PARITY,
+         .stopbits     = USART_1_STOPBIT,
+         .channelmode  = USART_NORMAL_CHMODE
+      };
+   // Assign GPIO to USART.
+   gpio_enable_module(USART_GPIO_MAP,
+                      sizeof(USART_GPIO_MAP) / sizeof(USART_GPIO_MAP[0]));
+
+   // Initialize USART in RS232 mode.
+   usart_init_rs232(ONBOARD_USART, &USART_OPTIONS, PBA_HZ);
+   
+   // Hello world!
+   usart_write_line(ONBOARD_USART, "\nHello, this is AT32AP7000 saying hello!\n");   
+}
 
 /**
  * \b main_thread_func
@@ -224,6 +265,9 @@ static void main_thread_func (uint32_t data)
 {
    uint32_t test_status;
    int sleep_ticks;
+
+   /* Initialise UART */
+   usart_app_init();
 
    test_status = test_start();
 

@@ -14,7 +14,8 @@ This work is in progress. Basic implementation is complete.
 TBD:
 - All 'SN:' TBDs
 - Testing on ATngw100/STK1000
-- UART Driver 
+- UART Driver [DONE]
 - Automated tests implementation
+- Simplify make file using VPATH and SRC
 
 

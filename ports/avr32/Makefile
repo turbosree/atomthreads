@@ -18,6 +18,8 @@ AVR32_INC_DIR=$(TOOL_CHAIN)/avr32/include
 INTC_DRIVER_DIR=./driver/INTC
 PM_DRIVER_DIR=./driver/PM
 TC_DRIVER_DIR=./driver/TC
+USART_DRIVER_DIR=./driver/USART
+PIO_DRIVER_DIR=./driver/PIO
 
 CC=$(TOOL_CHAIN)/bin/avr32-gcc 
 OBJCOPY=$(TOOL_CHAIN)/bin/avr32-objcopy 
@@ -40,18 +42,20 @@ PART=ap7000
 BUILD_DIR=build
 
 # Port/application object files
-APP_OBJECTS = atomport.o tests-main.o #SN: TBD - implement uart driver: uart.o 
+APP_OBJECTS = atomport.o tests-main.o
 APP_ASM_OBJECTS = atomport-asm.o
 INTC_DRIVER_OBJECTS = $(notdir $(patsubst %.c,%.o,$(wildcard $(INTC_DRIVER_DIR)/*.c)))
 INTC_DRIVER_ASM_OBJECTS = exception.o
 PM_DRIVER_OBJECTS = $(notdir $(patsubst %.c,%.o,$(wildcard $(PM_DRIVER_DIR)/*.c)))
 TC_DRIVER_OBJECTS = $(notdir $(patsubst %.c,%.o,$(wildcard $(TC_DRIVER_DIR)/*.c)))
+USART_DRIVER_OBJECTS = $(notdir $(patsubst %.c,%.o,$(wildcard $(USART_DRIVER_DIR)/*.c)))
+PIO_DRIVER_OBJECTS = $(notdir $(patsubst %.c,%.o,$(wildcard $(PIO_DRIVER_DIR)/*.c)))
 
 # Kernel object files
 KERNEL_OBJECTS = atomkernel.o atomsem.o atommutex.o atomtimer.o atomqueue.o
 
 # Collection of built objects (excluding test applications)
-ALL_OBJECTS = $(APP_OBJECTS) $(APP_ASM_OBJECTS) $(KERNEL_OBJECTS) $(INTC_DRIVER_OBJECTS) $(INTC_DRIVER_ASM_OBJECTS) $(PM_DRIVER_OBJECTS) $(TC_DRIVER_OBJECTS) 
+ALL_OBJECTS = $(APP_OBJECTS) $(APP_ASM_OBJECTS) $(KERNEL_OBJECTS) $(INTC_DRIVER_OBJECTS) $(INTC_DRIVER_ASM_OBJECTS) $(PM_DRIVER_OBJECTS) $(TC_DRIVER_OBJECTS) $(PIO_DRIVER_OBJECTS) $(USART_DRIVER_OBJECTS)
 BUILT_OBJECTS = $(patsubst %,$(BUILD_DIR)/%,$(ALL_OBJECTS))
 
 # SN: TBD - Implement tests
@@ -93,7 +97,7 @@ $(TEST_HEXS): %.hex: %.elf
 	$(OBJCOPY) -j .text -j .data -O ihex $(BUILD_DIR)/$< $(BUILD_DIR)/$@
 
 # Test ELF files (one application build for each test)
-$(TEST_ELFS): %.elf: %.o $(KERNEL_OBJECTS) $(APP_OBJECTS) $(APP_ASM_OBJECTS) $(INTC_DRIVER_OBJECTS) $(INTC_DRIVER_ASM_OBJECTS) $(PM_DRIVER_OBJECTS) $(TC_DRIVER_OBJECTS)
+$(TEST_ELFS): %.elf: %.o $(KERNEL_OBJECTS) $(APP_OBJECTS) $(APP_ASM_OBJECTS) $(INTC_DRIVER_OBJECTS) $(INTC_DRIVER_ASM_OBJECTS) $(PM_DRIVER_OBJECTS) $(TC_DRIVER_OBJECTS) $(PIO_DRIVER_OBJECTS) $(USART_DRIVER_OBJECTS)
 	$(CC) $(CFLAGS) $(BUILD_DIR)/$(notdir $<) $(BUILT_OBJECTS) --output $(BUILD_DIR)/$@ -Wl,-Map,$(BUILD_DIR)/$(basename $@).map
 
 # Kernel objects builder
@@ -132,9 +136,17 @@ $(PM_DRIVER_OBJECTS): %.o: $(PM_DRIVER_DIR)/%.c
 $(TC_DRIVER_OBJECTS): %.o: $(TC_DRIVER_DIR)/%.c 
 	$(CC) -c $(CFLAGS) -I. -I$(TC_DRIVER_DIR) -I$(AVR32_INC_DIR) $< -o $(BUILD_DIR)/$(notdir $@) 
 
+# USART_DRIVER asm objects builder
+$(USART_DRIVER_OBJECTS): %.o: $(USART_DRIVER_DIR)/%.c 
+	$(CC) -c $(CFLAGS) -I. -I$(USART_DRIVER_DIR) -I$(AVR32_INC_DIR) $< -o $(BUILD_DIR)/$(notdir $@) 
+
+# PIO_DRIVER asm objects builder
+$(PIO_DRIVER_OBJECTS): %.o: $(PIO_DRIVER_DIR)/%.c 
+	$(CC) -c $(CFLAGS) -I. -I$(PIO_DRIVER_DIR) -I$(AVR32_INC_DIR) $< -o $(BUILD_DIR)/$(notdir $@)
+
 # .lst file builder
 %.lst: %.c
-	$(CC) $(CFLAGS) -I. -I$(KERNEL_DIR) -I$(AVR32_INC_DIR) -I$(TESTS_DIR) -I$(INTC_DRIVER_DIR) -I$(PM_DRIVER_DIR) -I$(TC_DRIVER_DIR) -Wa,-al $< > $@
+	$(CC) $(CFLAGS) -I. -I$(KERNEL_DIR) -I$(AVR32_INC_DIR) -I$(TESTS_DIR) -I$(INTC_DRIVER_DIR) -I$(PM_DRIVER_DIR) -I$(TC_DRIVER_DIR) -I$(USART_DRIVER_DIR) -I$(PIO_DRIVER_DIR) -Wa,-al $< > $@
 
 # Clean
 clean:
